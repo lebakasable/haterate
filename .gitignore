@@ -1,0 +1,5 @@
+haterate
+*.aux
+*.log
+*.o
+*.pdf
