@@ -5,7 +5,7 @@ bubblesort: bubblesort.c
 	cc -Wall -Wextra -std=c11 -pedantic -ggdb -c bubblesort.c
 
 bubblesort.c: bubblesort.tex
-	./haterate bubblesort.tex > bubblesort.c
+	./haterate -o bubblesort.c bubblesort.tex
 
 bubblesort.pdf: bubblesort.tex
 	pdflatex bubblesort.tex
@@ -13,7 +13,6 @@ bubblesort.pdf: bubblesort.tex
 btree.py: btree.md
 	@python btree.py
 
-.PHONY: btree.md
-btree.md: btree.md
-	./haterate -m md -l python btree.md > btree.py
+btree.md:
+	./haterate -m md -l python -o btree.py btree.md
 

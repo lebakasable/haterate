@@ -39,6 +39,7 @@ export fn main() void = {
     ('b', "begin", "override the markup begin line"),
     ('e', "end", "override the markup end line"),
     ('c', "comment", "override the language comment symbol"),
+    ('o', "file", "override the output file (stdout by default)"),
     "<input>");
   defer getopt::finish(&cmd);
 
@@ -49,6 +50,8 @@ export fn main() void = {
 
   let markup = latex;
   let language = c;
+  let output = os::stdout;
+  defer io::close(output)!;
   for (const opt .. cmd.opts) {
     switch (opt.0) {
       case 'm' =>
@@ -66,6 +69,7 @@ export fn main() void = {
       case 'b' => markup.begin = opt.1;
       case 'e' => markup.end = opt.1;
       case 'c' => language.comment = opt.1;
+      case 'o' => output = os::create(opt.1, 429)!;
       case => abort();
     };
   };
@@ -83,13 +87,13 @@ export fn main() void = {
     case let line: const str =>
       if (code_mode) {
         if (line == markup.end) {
-          fmt::println(language.comment, line)!;
+          fmt::fprintln(output, language.comment, line)!;
           code_mode = false;
         } else {
-          fmt::println(line)!;
+          fmt::fprintln(output, line)!;
         };
       } else {
-        fmt::println(language.comment, line)!;
+        fmt::fprintln(output, language.comment, line)!;
         if (line == markup.begin) {
           code_mode = true;
         };
