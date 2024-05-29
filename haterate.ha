@@ -36,11 +36,11 @@ let python = language {
 export fn main() void = {
   const cmd = getopt::parse(os::args,
     "haterate",
-    ('b', "begin", "set the markup begin line"),
-    ('e', "end", "set the markup end line"),
-    ('c', "comment", "set the language comment symbol"),
     ('m', "tex|md", "use preset markup language"),
     ('l', "c|python", "use preset programming language"),
+    ('b', "begin", "override the markup begin line"),
+    ('e', "end", "override the markup end line"),
+    ('c', "comment", "override the language comment symbol"),
     "<input>");
   defer getopt::finish(&cmd);
 
@@ -52,9 +52,6 @@ export fn main() void = {
   let env = (latex, c);
   for (const opt .. cmd.opts) {
     switch (opt.0) {
-      case 'b' => env.0.begin = opt.1;
-      case 'e' => env.0.end = opt.1;
-      case 'c' => env.1.comment = opt.1;
       case 'm' =>
         switch (opt.1) {
           case "tex" => env.0 = latex;
@@ -67,6 +64,9 @@ export fn main() void = {
           case "python" => env.1 = python;
           case => fmt::fatal("error: unsupported programming language '{}'", opt.1);
         };
+      case 'b' => env.0.begin = opt.1;
+      case 'e' => env.0.end = opt.1;
+      case 'c' => env.1.comment = opt.1;
       case => abort();
     };
   };
