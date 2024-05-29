@@ -13,8 +13,6 @@ type language = struct {
   comment: str,
 };
 
-type env = (markup, language);
-
 let latex = markup {
   begin = "\\begin{code}",
   end = "\\end{code}",
@@ -49,24 +47,25 @@ export fn main() void = {
     os::exit(1);
   };
 
-  let env = (latex, c);
+  let markup = latex;
+  let language = c;
   for (const opt .. cmd.opts) {
     switch (opt.0) {
       case 'm' =>
         switch (opt.1) {
-          case "tex" => env.0 = latex;
-          case "md" => env.0 = markdown;
+          case "tex" => markup = latex;
+          case "md" => markup = markdown;
           case => fmt::fatal("error: unsupported markup language '{}'", opt.1);
         };
       case 'l' =>
         switch (opt.1) {
-          case "c" => env.1 = c;
-          case "python" => env.1 = python;
+          case "c" => language = c;
+          case "python" => language = python;
           case => fmt::fatal("error: unsupported programming language '{}'", opt.1);
         };
-      case 'b' => env.0.begin = opt.1;
-      case 'e' => env.0.end = opt.1;
-      case 'c' => env.1.comment = opt.1;
+      case 'b' => markup.begin = opt.1;
+      case 'e' => markup.end = opt.1;
+      case 'c' => language.comment = opt.1;
       case => abort();
     };
   };
@@ -83,15 +82,15 @@ export fn main() void = {
     case io::EOF => break;
     case let line: const str =>
       if (code_mode) {
-        if (line == env.0.end) {
-          fmt::println(env.1.comment, line)!;
+        if (line == markup.end) {
+          fmt::println(language.comment, line)!;
           code_mode = false;
         } else {
           fmt::println(line)!;
         };
       } else {
-        fmt::println(env.1.comment, line)!;
-        if (line == env.0.begin) {
+        fmt::println(language.comment, line)!;
+        if (line == markup.begin) {
           code_mode = true;
         };
       };
